@@ -19,6 +19,12 @@ jobs:
         java-version: '21'
         distribution: 'temurin'
         cache: maven
-        
+
+     - name: Build and Run Automated Tests
+      run: mvn -B test
+      working-directory: POE1
+
+
     - name: Build and Run Automated Tests
       run: mvn -B test
+      working-directory: POE1
