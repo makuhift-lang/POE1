@@ -1,27 +1,21 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package com.mycompany.poe1;
 
 import java.util.Random;
 
 /**
- *
+ * Message class managing metadata, validation, tracking hashes, and JSON serialization.
  * @author Student
  */
 public class Message {
     
-    // Member fields tracking message state information
-    private final String messageID;
+    private String messageID;
     private final int messageCount;
     private String recipientCell;
     private String messageText;
     
-    // Static tracker variable accumulated across application lifetime
+    // Tracks accumulated valid messages across the application lifetime
     private static int totalMessagesAccumulated = 0;
 
-    // Main parameterized constructor called inside project iteration loops
     public Message(int currentMessageNumber) {
         this.messageCount = currentMessageNumber;
         this.messageID = generateRandomMessageID();
@@ -29,7 +23,7 @@ public class Message {
         this.messageText = "";
     }
 
-    // Helper generation function returning a unique 10-digit identity tracker
+    // Auto-generates a unique tracking 10-digit identity value
     private String generateRandomMessageID() {
         Random rand = new Random();
         StringBuilder idBuilder = new StringBuilder();
@@ -44,15 +38,15 @@ public class Message {
         return getMessageID() != null && getMessageID().length() <= 10;
     }
 
-    // Method Functionality: Adjusted to allow up to 12 characters to support international formats (+27...)
+    // Method Functionality: Ensures recipient cell contains an international code and fits length rules
     public String checkRecipientCell() {
-        if (recipientCell == null || recipientCell.length() > 12 || !recipientCell.startsWith("+")) {
+        if (recipientCell == null || recipientCell.length() < 7 || recipientCell.length() > 14 || !recipientCell.startsWith("+")) {
             return "Cell phone number is incorrectly formatted or does not contain an international code. Please correct the number and try again.";
         }
         return "Cell phone number successfully captured.";
     }
 
-    // Utility Validation: Checks if message text conforms to length standards
+    // Utility Validation: Checks if message text conforms to the 250 character cap rules
     public String checkMessageLength() {
         if (messageText == null) {
             return "Message ready to send.";
@@ -64,16 +58,14 @@ public class Message {
         return "Message ready to send.";
     }
 
-    // Method Functionality: Creates and returns the Message Hash in uppercase
+    // Method Functionality: Creates and returns the Message Hash in ALL CAPS
     public String createMessageHash() {
-        // FIXED: Now calls getMessageID() so test overrides work cleanly
         if (getMessageID() == null || getMessageID().length() < 2 || messageText == null || messageText.trim().isEmpty()) {
             return "00:0:UNKNOWN";
         }
         
         String firstTwoDigits = getMessageID().substring(0, 2);
         
-        // Split text cleanly by space structures to pull outer word boundaries
         String[] words = messageText.trim().split("\\s+");
         String firstWord = words[0].replaceAll("[^a-zA-Z0-9]", "");
         String lastWord = words[words.length - 1].replaceAll("[^a-zA-Z0-9]", "");
@@ -83,7 +75,7 @@ public class Message {
         return firstTwoDigits + ":" + messageCount + ":" + combinedWords;
     }
 
-    // Method Functionality: Allows the user to choose if they want to send, store, or disregard the message
+    // Method Functionality: Allows the user to choose to send, store, or disregard the message
     public String SendMessage(int userSelection) {
         switch (userSelection) {
             case 1:
@@ -93,14 +85,13 @@ public class Message {
                 return "Press 0 to delete the message.";
             case 3:
                 totalMessagesAccumulated++;
-                storeMessage();
                 return "Message successfully stored.";
             default:
                 return "Invalid selection.";
         }
     }
 
-    // Method Functionality: Returns all the messages sent while the program is running sequentially
+    // Method Functionality: Returns all structural message info sequentially in the correct display order
     public String printMessages() {
         return "Message ID: " + getMessageID() + "\n" +
                "Message Hash: " + createMessageHash() + "\n" +
@@ -108,12 +99,12 @@ public class Message {
                "Message: " + messageText;
     }
 
-    // Method Functionality: Returns the total number of messages sent
+    // Method Functionality: Returns the total number of valid messages sent/stored
     public int returnTotalMessages() {
         return totalMessagesAccumulated;
     }
 
-    // Custom defined storeMessage method: Researches how to create a method to store messages in JSON format
+    // Research Method: Builds a valid JSON layout out of the message object properties
     public void storeMessage() {
         String jsonStructure = "{\n" +
                 "  \"messageID\": \"" + getMessageID() + "\",\n" +
@@ -124,13 +115,14 @@ public class Message {
         System.out.println(jsonStructure);
     }
 
-    // Static helper to reset testing context counters safely between separate evaluations
+    // Helper to safely reset metrics between distinct automated unit tests
     public static void resetAccumulator() {
         totalMessagesAccumulated = 0;
     }
 
     // ==================== GETTERS AND SETTERS ====================
     public String getMessageID() { return messageID; }
+    public void setMessageID(String messageID) { this.messageID = messageID; } 
     public int getMessageCount() { return messageCount; }
     public String getRecipientCell() { return recipientCell; }
     public void setRecipientCell(String recipientCell) { this.recipientCell = recipientCell; }
