@@ -22,4 +22,4 @@ jobs:
 
     - name: Build and Run Automated Tests
       run: mvn -B test
-      working-directory: POE1
+      
