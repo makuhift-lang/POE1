@@ -1,13 +1,9 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package com.mycompany.poe1;
 
 import java.util.regex.Pattern;
 
 /**
- *
+ * Handles user registration validation and login authentication.
  * @author Student
  */
 public class Login {
@@ -17,7 +13,7 @@ public class Login {
     private String lastName;
     private String cellPhone;
 
-    // MUST HAVE: Blank default constructor for "new Login()"
+    // Initializes empty user credentials
     public Login() {
         this.username = "";
         this.password = "";
@@ -26,41 +22,31 @@ public class Login {
         this.cellPhone = "";
     }
 
-    public Login(String username, String password, String firstName, String lastName, String cellPhone) {
-        this.username = username;
-        this.password = password;
-        this.firstName = firstName;
-        this.lastName = lastName;
-        this.cellPhone = cellPhone;
-    }
-
+    // Validates username contains underscore and is max 5 characters
     public boolean checkUserName() {
-        if (username == null) return false;
-        return username.contains("_") && username.length() <= 5;
+        return username != null && username.contains("_") && username.length() <= 5;
     }
 
+    // Validates password length (8+), uppercase, digit, and special character
     public boolean checkPasswordComplexity() {
         if (password == null || password.length() < 8) return false;
-        
-        boolean hasUpper = false;
-        boolean hasDigit = false;
-        boolean hasSpecial = false;
-        Pattern specialChars = Pattern.compile("[^a-zA-Z0-9]");
-        
+        boolean upper = false, digit = false, special = false;
+        Pattern p = Pattern.compile("[^a-zA-Z0-9]");
         for (int i = 0; i < password.length(); i++) {
-            char ch = password.charAt(i);
-            if (Character.isUpperCase(ch)) hasUpper = true;
-            else if (Character.isDigit(ch)) hasDigit = true;
-            else if (specialChars.matcher(String.valueOf(ch)).matches()) hasSpecial = true;
+            char c = password.charAt(i);
+            if (Character.isUpperCase(c)) upper = true;
+            else if (Character.isDigit(c)) digit = true;
+            else if (p.matcher(String.valueOf(c)).matches()) special = true;
         }
-        return hasUpper && hasDigit && hasSpecial;
+        return upper && digit && special;
     }
 
+    // Validates South African cell number (+27 followed by 9 digits)
     public boolean checkCellPhoneNumber() {
-        if (cellPhone == null) return false;
-        return cellPhone.matches("^\\+\\d{11}$");
+        return cellPhone != null && cellPhone.matches("^\\+27\\d{9}$");
     }
 
+    // Returns registration status message based on field validations
     public String registerUser() {
         if (!checkUserName()) return "Username is not correctly formatted; please ensure that your username contains an underscore and is no more than five characters in length.";
         if (!checkPasswordComplexity()) return "Password is not correctly formatted; please ensure that the password contains at least eight characters, a capital letter, a number, and a special character.";
@@ -68,17 +54,16 @@ public class Login {
         return "The user has been registered successfully.";
     }
 
-    public boolean loginUser(String attemptUser, String attemptPass) {
-        if (this.username == null || this.password == null) return false;
-        return this.username.equals(attemptUser) && this.password.equals(attemptPass);
+    // Authenticates entered credentials against stored user details
+    public boolean loginUser(String u, String p) {
+        return username.equals(u) && password.equals(p);
     }
 
-    public String returnLoginStatus(boolean loginResult) {
-        if (loginResult) return "Welcome " + firstName + ", " + lastName + " it is great to see you again.";
-        return "Username or password incorrect, please try again.";
+    // Returns welcome or failure message after login attempt
+    public String returnLoginStatus(boolean ok) {
+        return ok ? "Welcome " + firstName + ", " + lastName + " it is great to see you again." : "Username or password incorrect, please try again.";
     }
 
-    // Setters and Getters used by Main.java
     public void setUsername(String username) { this.username = username; }
     public void setPassword(String password) { this.password = password; }
     public void setFirstName(String firstName) { this.firstName = firstName; }
